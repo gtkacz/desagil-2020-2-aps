@@ -4,13 +4,19 @@ import br.pro.hashi.ensino.desagil.aps.model.model.Gate;
 import br.pro.hashi.ensino.desagil.aps.model.model.Switch;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.net.URL;
 
-public class GateView extends JPanel implements ActionListener {
+public class GateView extends FixedPanel implements ActionListener, MouseListener {
     private final Gate gate;
     private final JCheckBox[] input;
     private final JCheckBox output;
+    private Color color;
+    private final Image image;
 
     public GateView(Gate gate) {
         this.gate = gate;
@@ -37,6 +43,10 @@ public class GateView extends JPanel implements ActionListener {
         add(outputLabel);
         add(output);
 
+        // Usamos esse carregamento nos Desafios, vocês lembram?
+        String name = gate.toString() + ".png";
+        URL url = getClass().getClassLoader().getResource(name);
+        image = getToolkit().getImage(url);
         output.setEnabled(false);
 
         update();
@@ -67,5 +77,32 @@ public class GateView extends JPanel implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent event) {
         update();
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        // Descobre em qual posição o clique ocorreu.
+        int x = e.getX();
+        int y = e.getY();
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+
     }
 }
