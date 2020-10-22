@@ -21,7 +21,8 @@ public class APS {
             JFrame frame = new JFrame();
             frame.setContentPane(view);
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setResizable(true);
+            frame.setResizable(false);
+            frame.setTitle("Simulador de portas lógicas");
             frame.pack();
             frame.setVisible(true);
         });

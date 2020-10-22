@@ -1,6 +1,7 @@
 package br.pro.hashi.ensino.desagil.aps.model.view;
 
 import br.pro.hashi.ensino.desagil.aps.model.model.Gate;
+import br.pro.hashi.ensino.desagil.aps.model.model.Light;
 import br.pro.hashi.ensino.desagil.aps.model.model.Switch;
 
 import javax.swing.*;
@@ -14,22 +15,18 @@ import java.net.URL;
 public class GateView extends FixedPanel implements ActionListener, MouseListener {
     private final Gate gate;
     private final JCheckBox[] input;
-    private final JCheckBox output;
-    private Color color;
+    private final Light output;
     private final Image image;
+    private Color color;
 
     public GateView(Gate gate) {
+        super(350, 200);
         this.gate = gate;
 
         input = new JCheckBox[gate.getInputSize()];
-        output = new JCheckBox();
+        // Se o output for 1, o círculo acenderá verde.
+        output = new Light(0, 255, 0);
 
-        JLabel inputLabel = new JLabel("Entrada:");
-        JLabel outputLabel = new JLabel("Saída:");
-
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
-        add(inputLabel);
         //Adicionando a quantidade de checkbox necessária
         //dependendo do Gate escolhido, visto que por exemplo,
         //o gate NOT apresenta apenas 1 entrada (gate.inputSize = 1)
@@ -40,14 +37,25 @@ public class GateView extends FixedPanel implements ActionListener, MouseListene
             input[i].addActionListener(this);
         }
 
-        add(outputLabel);
-        add(output);
+        //Adicionando checkbox nas posições a partir de pixels.
+        //Logo, se o gate apresenta mais de 1 entrada (Caso de todos
+        //menos o NOT, há uma regra para posicionamento dos checkboxes.
+        if (input.length > 1) {
+            input[0].setLocation(63, 60);
+            input[0].setSize(20, 25);
+            input[1].setLocation(63, 103);
+            input[1].setSize(20, 25);
+        } else {
+            input[0].setLocation(45, 88);
+            input[0].setSize(25, 25);
+        }
+        output.connect(0, gate);
+        color = Color.BLACK;
 
-        // Usamos esse carregamento nos Desafios, vocês lembram?
         String name = gate.toString() + ".png";
         URL url = getClass().getClassLoader().getResource(name);
         image = getToolkit().getImage(url);
-        output.setEnabled(false);
+        addMouseListener(this);
 
         update();
     }
@@ -69,9 +77,8 @@ public class GateView extends FixedPanel implements ActionListener, MouseListene
             gate.connect(i, interruptor);
         }
 
-        //Leitura do resultado da conexão estabelecida.
-        boolean saida = gate.read();
-        output.setSelected(saida);
+        //Leitura do resultado da conexão estabelecida, agora utilizando cores.
+        repaint();
     }
 
     @Override
@@ -84,25 +91,43 @@ public class GateView extends FixedPanel implements ActionListener, MouseListene
         // Descobre em qual posição o clique ocorreu.
         int x = e.getX();
         int y = e.getY();
+
+        if (Math.sqrt(Math.pow((x - 288), 2) + Math.pow((y - 97), 2)) <= 10) {
+
+            color = JColorChooser.showDialog(this, null, color);
+            output.setColor(color);
+
+            repaint();
+        }
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
-
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-
     }
 
     @Override
     public void mouseEntered(MouseEvent e) {
-
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
+    }
 
+    @Override
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+
+        g.drawImage(image, 20, 20, 320, 160, this);
+
+        g.setColor(output.getColor());
+        g.fillOval(278, 87, 20, 20);
+
+        // Linha necessária para evitar atrasos
+        // de renderização em sistemas Linux.
+        getToolkit().sync();
     }
 }
